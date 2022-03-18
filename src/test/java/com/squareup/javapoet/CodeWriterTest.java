@@ -1,4 +1,4 @@
-package com.squareup.javapoet;
+ package com.squareup.javapoet;
 
 import org.junit.Test;
 

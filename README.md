@@ -1,3 +1,59 @@
+javapoet可以更加快捷地生成字节码，实现原理其实也就是对JavaAPT的封装，然而Javapoet有一个局限性，
+【就是只能生成新的.class文件，却无法修改原有的类】 这也是它的一大局限性所在。接下来就让我们看看它的使用方法把。
+
+
+[javapoet api 文档](https://square.github.io/javapoet/1.x/javapoet)
+
+[java.compiler api 文档](https://www.apiref.com/java11-zh/java.compiler/javax/annotation/processing/ProcessingEnvironment.html)
+
+[java注解处理器——在编译期修改语法树](https://blog.csdn.net/A_zhenzhen/article/details/86065063?spm=1001.2101.3001.6650.7&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-7.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-7.pc_relevant_paycolumn_v3&utm_relevant_index=13)
+
+[抽象语法树AST的全面解析（一）](https://www.jianshu.com/p/ff8ec920f5b9)
+[抽象语法树AST的全面解析（二）](https://www.jianshu.com/p/4bd5dc13f35a)
+
+[抽象语法树AST的全面解析（三）](https://www.jianshu.com/p/68fcbc154c2f)
+[Javac编译原理 ](https://www.cnblogs.com/wade-luffy/p/5925728.html#_label1)
+```aidl
+词法分析器
+语法分析器
+语义分析器
+代码生成器
+
+```
+[]()
+
+[]()
+
+[com.squareup.javapoet api 文档](https://square.github.io/javapoet/1.x/javapoet/)
+
+[JavaPoet使用指南](https://juejin.cn/post/6844903456629587976)
+
+```aidl
+格式化规则	表示含义
+$L	字面量
+$S	字符串
+$T	类、接口
+$N	变量
+```
+
+
+```aidl
+[Class CodeBlock](https://square.github.io/javapoet/1.x/javapoet/)
+
+$L 发出一个没有转义的文字值。文字的参数可以是字符串、原语、类型声明、注释甚至其他代码块。
+$N 发出一个名称，在必要时使用名称冲突避免。名称的参数可以是字符串（实际上是任何字符序列）、参数、字段、方法和类型。
+$S 将值作为字符串转义，用双引号括起来，然后发出。例如，6" 三明治发出“6\" 三明治”。
+$T 发出一个类型引用。如果可能，将导入类型。类型的参数可以是类、,* 类型镜像和元素。
+$$ 发出一个美元符号。
+$W 发出一个空格或换行符，具体取决于它在行上的位置。这更喜欢在 100 列之前换行。
+$Z 充当零宽度空间。这更喜欢在 100 列之前换行。
+$> 增加缩进级别。
+$< 降低缩进级别。
+$[ 开始一个语句。对于多行语句，第一行之后的每一行都是双缩进的。
+$] 结束一个语句。
+```
+
+
 JavaPoet
 ========
 

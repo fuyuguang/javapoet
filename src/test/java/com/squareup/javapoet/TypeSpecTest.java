@@ -66,6 +66,7 @@ public final class TypeSpecTest {
             .addCode("return $S;\n", "taco")
             .build())
         .build();
+
     assertThat(toString(taco)).isEqualTo(""
         + "package com.squareup.tacos;\n"
         + "\n"
@@ -82,7 +83,11 @@ public final class TypeSpecTest {
   }
 
   @Test public void interestingTypes() throws Exception {
+    //参数化类型  具有<>符号的变量是参数化类型   get(ClassName 实际类型, TypeName... 类型参数)
+    //ParameterizedType（参数化类型） 参数化类型，即泛型；例如：List< T>、Map< K,V>等带有参数化的对象。
     TypeName listOfAny = ParameterizedTypeName.get(
+            //用  ClassName  生成的类名不需要导包
+            //WildcardType（ 泛型表达式类型）通配符表达式，或泛型表达式，它虽然是Type的一个子接口，但并不是Java类型中的一种，表示的仅仅是类似 ? extends T、? super K这样的通配符表达式。
         ClassName.get(List.class), WildcardTypeName.subtypeOf(Object.class));
     TypeName listOfExtends = ParameterizedTypeName.get(
         ClassName.get(List.class), WildcardTypeName.subtypeOf(Serializable.class));
@@ -93,6 +98,7 @@ public final class TypeSpecTest {
         .addField(listOfExtends, "extendsSerializable")
         .addField(listOfSuper, "superString")
         .build();
+//    System.out.println(toString(taco));
     assertThat(toString(taco)).isEqualTo(""
         + "package com.squareup.tacos;\n"
         + "\n"
@@ -110,35 +116,55 @@ public final class TypeSpecTest {
   }
 
   @Test public void anonymousInnerClass() throws Exception {
+    //Foo
     ClassName foo = ClassName.get(tacosPackage, "Foo");
+    //Bar
     ClassName bar = ClassName.get(tacosPackage, "Bar");
+    //com.squareup.tacos.Thing.Thang
     ClassName thingThang = ClassName.get(tacosPackage, "Thing", "Thang");
+    //com.squareup.tacos.Thing.Thang<Foo,Bar>
     TypeName thingThangOfFooBar = ParameterizedTypeName.get(thingThang, foo, bar);
+    //com.squareup.tacos.Thung
     ClassName thung = ClassName.get(tacosPackage, "Thung");
+    //com.squareup.tacos.SimpleThung
     ClassName simpleThung = ClassName.get(tacosPackage, "SimpleThung");
+    //com.squareup.tacos.Thung  ? extends Bar   / Thung<? super Bar>
     TypeName thungOfSuperBar = ParameterizedTypeName.get(thung, WildcardTypeName.supertypeOf(bar));
+    //com.squareup.tacos.Thung  ? extends Foo   / Thung<? super Foo>
     TypeName thungOfSuperFoo = ParameterizedTypeName.get(thung, WildcardTypeName.supertypeOf(foo));
+    //com.squareup.tacos.SimpleThung<Bar>
     TypeName simpleThungOfBar = ParameterizedTypeName.get(simpleThung, bar);
-
+    //Thung<? super Foo> thung
     ParameterSpec thungParameter = ParameterSpec.builder(thungOfSuperFoo, "thung")
+            //final Thung<? super Foo> thung
         .addModifiers(Modifier.FINAL)
         .build();
+    // new 匿名类 (Thung<? super Foo> thung)  ，创建匿名类，构造加参数
+    //  $N   $N在JavaPoet中代指的是一个名称，例如调用的方法名称，变量名称，这一类存在意思的名称    addStatement("data.$N()",toString)
     TypeSpec aSimpleThung = TypeSpec.anonymousClassBuilder(CodeBlock.of("$N", thungParameter))
+            //new com.squareup.tacos.SimpleThung<Bar>(Thung<? super Foo> thung)
         .superclass(simpleThungOfBar)
+            //方法名称doSomething
         .addMethod(MethodSpec.methodBuilder("doSomething")
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
+                //方法参数
             .addParameter(bar, "bar")
             .addCode("/* code snippets */\n")
             .build())
         .build();
     TypeSpec aThingThang = TypeSpec.anonymousClassBuilder("")
+            //匿名类的父类为 com.squareup.tacos.Thing.Thang<Foo,Bar>
         .superclass(thingThangOfFooBar)
+            //包含一个 call 方法
         .addMethod(MethodSpec.methodBuilder("call")
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
+                //返回类型   Thung<? super Bar>
             .returns(thungOfSuperBar)
+                //参数  final Thung<? super Foo> thung
             .addParameter(thungParameter)
+                //$L 文本值    $S 字符串  $T 对象    $N在JavaPoet中代指的是一个名称
             .addCode("return $L;\n", aSimpleThung)
             .build())
         .build();
@@ -148,7 +174,7 @@ public final class TypeSpecTest {
             .initializer("$L", aThingThang)
             .build())
         .build();
-
+    System.out.println(toString(taco));
     assertThat(toString(taco)).isEqualTo(""
         + "package com.squareup.tacos;\n"
         + "\n"
@@ -1075,6 +1101,7 @@ public final class TypeSpecTest {
     ClassName methodInPackage = ClassName.get("com.squareup.tacos", "MethodInPackage");
     ClassName methodOtherType = ClassName.get("com.other", "MethodOtherType");
     TypeSpec gen = TypeSpec.classBuilder("Gen")
+        //添加泛型信息
         .addTypeVariable(TypeVariableName.get("InPackage"))
         .addTypeVariable(TypeVariableName.get("OtherType"))
         .addField(FieldSpec.builder(inPackage, "inPackage").build())
@@ -2078,6 +2105,7 @@ public final class TypeSpecTest {
   }
 
   @Test public void ifElse() {
+
     TypeSpec taco = TypeSpec.classBuilder("Taco")
         .addMethod(
             MethodSpec.methodBuilder("isDelicious")
